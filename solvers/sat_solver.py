@@ -57,50 +57,46 @@ class SATSolver:
         Returns:
             tuple: (solution grid, solving time in seconds, was solution found)
         """
-        if not self.cnf:
-            if not self.load_dimacs():
-                return None, 0, False
+        if not self.cnf and not self.load_dimacs():
+            return None, 0, False
                 
         start_time = time.time()
-        
         solution_grid = None
         if self.puzzle:
-            solution_grid = [row[:] for row in self.puzzle]  # Deep copy
+            solution_grid = [row[:] for row in self.puzzle] 
         else:
-            # Get grid dimensions from the CNF
             max_var = self.cnf.nv
-            grid_size = int(max_var ** 0.5)  # Assuming square grid
+            grid_size = int(max_var ** 0.5)
             solution_grid = [[consts.EMPTY_CELL for _ in range(grid_size)] for _ in range(grid_size)]
             self.width = self.height = grid_size
             
-        # Create a SAT solver and add the CNF formula
         solver = Solver(name='g4')
         solver.append_formula(self.cnf)
         
-        # Solve the formula
         is_satisfiable = solver.solve()
         
-        if is_satisfiable:
-            # Extract solution from the model
-            model = solver.get_model()
-            
-            for var in model:
-                if var > 0:  # True variables represent trap positions
-                    row, col = unflatten(self.height, var)
-                    if 0 <= row < self.height and 0 <= col < self.width:
-                        solution_grid[row][col] = consts.TRAP_CELL
-                        
-            # Mark all other unassigned cells as gems (if original puzzle is available)
-            if self.puzzle:
-                for i in range(self.height):
-                    for j in range(self.width):
-                        # If cell is empty in solution but has a number in puzzle, preserve the number
-                        if solution_grid[i][j] == consts.EMPTY_CELL:
-                            if self.puzzle[i][j] != consts.EMPTY_CELL and not self.puzzle[i][j].isdigit():
-                                solution_grid[i][j] = consts.GEM_CELL
+        if not is_satisfiable:
+            print("No solution exists for the given CNF formula.")
+            return solution_grid, time.time() - start_time, False
+
+        model = solver.get_model()
+        for var in model:
+            is_trap_cell = var > consts.ZERO_VALUE
+            if is_trap_cell: 
+                row, col = unflatten(self.height, var)
+                if consts.ZERO_VALUE <= row < self.height and consts.ZERO_VALUE <= col < self.width:
+                    solution_grid[row][col] = consts.TRAP_CELL
+                    
+        if self.puzzle:
+            for row in range(self.height):
+                for col in range(self.width):
+                    is_empty_in_solution = solution_grid[row][col] == consts.EMPTY_CELL
+                    is_empty_in_puzzle = self.puzzle[row][col] == consts.EMPTY_CELL
+                    
+                    if is_empty_in_solution and is_empty_in_puzzle:
+                        solution_grid[row][col] = consts.GEM_CELL
         
         solving_time = time.time() - start_time
-        
         return solution_grid, solving_time, is_satisfiable
 
     def get_cnf_stats(self):
@@ -118,21 +114,17 @@ if __name__ == "__main__":
     import sys
     import os
 
-    # Get CNF file path from command line argument or prompt user
     if len(sys.argv) > 1:
         dimacs_file = sys.argv[1]
     else:
         dimacs_file = input("Enter path to DIMACS CNF file: ")
 
-    # Check if file exists
     if not os.path.exists(dimacs_file):
         print(f"Error: File '{dimacs_file}' not found")
         sys.exit(1)
 
-    # Create solver with no puzzle (will create empty grid based on CNF)
     solver = SATSolver(puzzle=None, dimacs_file=dimacs_file)
     
-    # Print CNF stats
     stats = solver.get_cnf_stats()
     if stats:
         print("\nCNF Statistics:")
@@ -140,7 +132,6 @@ if __name__ == "__main__":
         print(f"Clauses: {stats['clauses']}")
         print(f"Source: {stats['source']}\n")
 
-    # Solve the puzzle
     solution, solve_time, is_sat = solver.solve()
     
     if is_sat:
