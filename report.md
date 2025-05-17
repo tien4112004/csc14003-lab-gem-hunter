@@ -8,8 +8,6 @@
 
 ### 3.1. Propositional Logic
 
-???
-
 ## 3. Algorithms
 
 ### 3.0. DIMACS Format
@@ -73,10 +71,27 @@ p cnf 3 2
   - There are no more than $2$ traps in the surrounding cells.
   - There are no less than $2$ traps in the surrounding cells.
 
-- In symbol form, we can say that the center cell is `2` if and only if the following conditions are satisfied:
+---
 
-  - $T_1 + T_2 + T_3 + T_4 + T_5 + T_6 + T_7 + T_8 \leq 2$
-  - $T_1 + T_2 + T_3 + T_4 + T_5 + T_6 + T_7 + T_8 \geq 2$
+# REWRITE THIS PART
+
+Let the cells around the center be numbered as variables $x_1, x_2, ..., x_8$ (if all 8 surrounding cells exist). When $x_i = TRUE$, the cell is a trap; when $x_i = FALSE$, the cell is not a trap.
+
+In our example, we already know that $x_1 = 1$ and $x_2 = 1$ (the two traps in the top row). The other cells (marked with "?") are represented by variables $x_3$ through $x_8$.
+
+To express "exactly 2 traps" in CNF:
+
+1. At most 2 traps: For any combination of 3 cells, at least one must NOT be a trap.
+   - For every subset of 3 variables {$x_i, x_j, x_k$}, we add the clause: $(\neg x_i \lor \neg x_j \lor \neg x_k)$
+   - This prevents having 3 or more traps.
+2. At least 2 traps: Since we already know $x_1 = 1$ and $x_2 = 1$, this constraint is satisfied.
+
+- Without this knowledge, we would need clauses to ensure that for any subset of $(n-1)$ variables (where $n$ is the total number of surrounding cells), at least one must be a trap.
+  In our specific example with the known traps, we only need the "at most 2 traps" constraints.
+
+Since we already have two traps ($x_1$ and $x_2$), the CNF clauses would enforce that none of the other surrounding cells can be traps: $(\neg x_3), (\neg x_4), (\neg x_5), (\neg x_6), (\neg x_7), (\neg x_8)$
+
+## This is how the algorithm ensures that the exact number of traps matches the number in the cell, by combining "at most k" and "at least k" constraints through CNF clauses.
 
 ### 3.2. Brute-force algorithm
 
@@ -96,4 +111,4 @@ For this algorithm, we will try all set of value for the CNF formula. If result 
 
 ## 6. References
 
-[1] Antonio Morgado Alexey Ignatiev Joao Marques-Silva. Boolean formula manipulation (pysat.formula). Accessed: May 2025. url: https://pysathq.github.io/docs/html/api/formula.html
+[1] Antonio Morgado Alexey Ignatiev Joao Marques-Silva. Boolean formula manipulation (pysat.formula). Accessed: 12 May 2025. url: https://pysathq.github.io/docs/html/api/formula.html

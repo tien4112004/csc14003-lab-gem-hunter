@@ -26,7 +26,7 @@ def load_map(filename) -> tuple[list[list[str]], int, int]:
     
     return puzzle, height, width
 
-def save_solution(filename, solution, height, width) -> str:
+def save_solution(filename, solution, height, width, solver_name) -> str:
     """
     Save a solution to a file.
     
@@ -39,6 +39,7 @@ def save_solution(filename, solution, height, width) -> str:
     Returns:
         str: The path to the saved solution file.
     """
+    filename = f"{filename}_{solver_name}.txt"
     solution_dir = os.path.join(os.path.dirname(filename), 'solution')
     if not os.path.exists(solution_dir):
         os.makedirs(solution_dir)

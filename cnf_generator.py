@@ -1,8 +1,7 @@
-from utils.solver_utils import get_neighbors
+from utils.solver_utils import get_neighbors, flatten
 import consts
 from itertools import combinations
 from utils.io import load_map
-
 
 class MapToCNF:
     def __init__(self, map: tuple):
@@ -18,21 +17,6 @@ class MapToCNF:
         self.grid, width, height = map
         self.n = width
         self.clauses = []
-    
-    def flatten(self, row, col) -> int:
-        """
-        Convert a cell position to a variable number
-        """
-        return row * self.n + col + consts.CNF_STARTING_VAR
-
-    def unflatten(self, var) -> tuple[int, int]:
-        """
-        Convert a variable number back to a cell position (row, col)
-        """
-        var -= consts.CNF_STARTING_VAR
-        row = var // self.n
-        col = var % self.n
-        return row, col
         
     def convert_to_cnf(self):
         """Convert the map to CNF clauses with all necessary constraints"""
@@ -44,16 +28,15 @@ class MapToCNF:
                 
                 if cell == consts.EMPTY_CELL:
                     continue
-                
                     
                 # assigned cell -> a number -> not a trap
-                cell_var = self.flatten(row, col)
+                cell_var = flatten(self.n, row, col)
                 unique_clauses_set.add(frozenset([-cell_var]))
                 
                 cell_int = int(cell)
                 neighbors = get_neighbors(row, col, self.n, self.n)            
                 unassigned_neighbors = [(r, c) for r, c in neighbors if self.grid[r][c] == consts.EMPTY_CELL]
-                neighbor_vars = [self.flatten(r, c) for r, c in unassigned_neighbors]
+                neighbor_vars = [flatten(self.n, r, c) for r, c in unassigned_neighbors]
                 
                 if cell_int == consts.ZERO_VALUE: 
                     for neighbor in neighbor_vars:
@@ -176,8 +159,8 @@ if __name__ == "__main__":
             cnf_clauses = converter.convert_to_cnf()
             converter.print_report()
             
-            dimacs_output = converter.to_dimacs(output_file=output_file)
-            print(f"CNF output written to: {output_file}")
+            dimacs_output = converter.to_dimacs(output_file=f"cnf/{output_file}")
+            print(f"CNF output written to: cnf/{output_file}")
             
         except Exception as e:
             print(f"Error processing {map_file}: {e}")

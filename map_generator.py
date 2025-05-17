@@ -54,7 +54,7 @@ def generate_map(height, width, trap_probability=0.25):
                     if solution[next_i, next_j] == consts.TRAP_CELL:
                         has_trap = True
                         break
-                    elif solution[next_i, next_j] not in [consts.EMPTY_CELL, consts.GEM_CELL]:  # It's a number
+                    elif solution[next_i, next_j] not in [consts.EMPTY_CELL, consts.GEM_CELL]:
                         has_number = True
                 
                 # If current cell has a number neighbor but no trap neighbors, it's a gem
