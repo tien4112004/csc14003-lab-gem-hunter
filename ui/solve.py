@@ -1,7 +1,8 @@
 import time
 from utils.io import load_map, save_solution
 from solvers.sat_solver import SATSolver
-from solvers.classical_solvers import BruteForceSolver, BacktrackingSolver
+from solvers.backtracking_solvers import BacktrackingSolver
+from solvers.bruteforce_solver import BruteForceSolver
 from utils.solver_utils import print_grid
 from cnf_generator import MapToCNF
 
@@ -43,12 +44,12 @@ def solve_map(filename, solver_type='all'):
         elif solver == 'bf':
             print("\n" + "="*50)
             print("Solving using Brute Force solver...")
-            solver_obj = BruteForceSolver(puzzle)
+            solver_obj = BruteForceSolver(puzzle, dimacs_file=cnf_path)
             
         elif solver == 'bt':
             print("\n" + "="*50)
             print("Solving using Backtracking solver...")
-            solver_obj = BacktrackingSolver(puzzle)
+            solver_obj = BacktrackingSolver(puzzle, dimacs_file=cnf_path)
             
         else:
             print(f"Unknown solver type: {solver}")
@@ -56,7 +57,6 @@ def solve_map(filename, solver_type='all'):
         
         try:
             solution, solving_time, found_solution = solver_obj.solve()
-            
             results[solver] = {
                 'solution': solution,
                 'time': solving_time,

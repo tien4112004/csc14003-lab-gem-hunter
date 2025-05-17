@@ -38,3 +38,4 @@ def unflatten(n, var) -> tuple[int, int]:
     row = var // n
     col = var % n
     return row, col
+    
