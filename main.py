@@ -1,85 +1,62 @@
 import os
-import curses
-from curses import wrapper
+import sys
+from colorama import init
 
-def get_map_files():
-    map_dir = "maps"
-    if not os.path.exists(map_dir):
-        return []
-    
-    map_files = [f for f in os.listdir(map_dir) if os.path.isfile(os.path.join(map_dir, f))]
-    return map_files
+import consts
+from ui.menu import (
+    main_menu, generate_map_menu, map_selection_menu, 
+    solver_selection_menu, benchmark_menu, cnf_explanation_menu
+)
+from ui.cli import parse_args, process_args
+from utils.io import clear_screen
+from ui.display import solve_map
 
-def display_menu(stdscr, map_files, selected_idx):
-    stdscr.clear()
-    h, w = stdscr.getmaxyx()
-    
-    title = "GEM HUNTER - MAP SELECTION"
-    x = w//2 - len(title)//2
-    stdscr.addstr(2, x, title, curses.A_BOLD)
-    
-    instructions = "Use [UP/DOWN] arrows to navigate, [ENTER] to select, [Q] to quit"
-    x = w//2 - len(instructions)//2
-    stdscr.addstr(4, x, instructions)
-    
-    start_y = 6
-    if map_files:
-        for i, map_file in enumerate(map_files):
-            x = w//2 - len(map_file)//2
-            if i == selected_idx:
-                stdscr.addstr(start_y + i, x, map_file, curses.A_REVERSE)
-            else:
-                stdscr.addstr(start_y + i, x, map_file)
-    else:
-        no_maps = "No maps found in the maps/ directory!"
-        x = w//2 - len(no_maps)//2
-        stdscr.addstr(start_y, x, no_maps)
-    
-    stdscr.refresh()
+# Initialize colorama for cross-platform colored output
+init()
 
-def map_selection_menu():
-    map_files = get_map_files()
-    if not map_files:
-        print("No maps found in the maps/ directory!")
-        return None
-    
-    def _menu(stdscr):
-        curses.curs_set(0)  # Hide cursor
-        selected_idx = 0
-                
-        while True:
-            display_menu(stdscr, map_files, selected_idx)
-            
-            # Get key press
-            key = stdscr.getch()
-            
-            if key == curses.KEY_UP and selected_idx > 0:
-                selected_idx -= 1
-            elif key == curses.KEY_DOWN and selected_idx < len(map_files) - 1:
-                selected_idx += 1
-            elif key == curses.KEY_ENTER or key in [10, 13]:  # Enter key
-                return map_files[selected_idx]
-            elif key == ord('q') or key == ord('Q'):
-                return None
-    
-    try:
-        selected_map = wrapper(_menu)
-        return selected_map
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
-    
 def main():
-    print("Welcome to Gem Hunter!")
+    """Main function to run the Gem Hunter program."""
+    print("Gem Hunter Solver started")
     
-    selected_map = map_selection_menu()
-    
-    if selected_map:
-        map_path = os.path.join("maps", selected_map)
-        print(f"Selected map: {map_path}")
-        # load_and_run_game(map_path)
-    else:
-        print("No map selected. Exiting...")
+    while True:
+        option = main_menu()
+        
+        if option == consts.MENU_OPTIONS_GENERATE_MAP:
+            generate_map_menu()
+        
+        elif option == consts.MENU_OPTIONS_SOLVE_MAP:
+            map_file = map_selection_menu()
+            if map_file:
+                solver_type = solver_selection_menu()
+                if solver_type:
+                    clear_screen()
+                    print("\n" + "="*50)
+                    print("               SOLVE MAP")
+                    print("="*50)
+                    solve_map(map_file, solver_type)
+                    input("\nPress Enter to continue...")
+        
+        elif option == consts.MENU_OPTIONS_BENCHMARK:
+            benchmark_menu()
+        
+        elif option == consts.MENU_OPTIONS_CNF_EXPLANATION:
+            cnf_explanation_menu()
+        
+        else:
+            clear_screen()
+            print("\nExiting Gem Hunter. Goodbye!")
+            break
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()   
+    if process_args(args):
+        sys.exit(0)
+    
+    # no args -> fallback to interactive mode
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\nProgram interrupted. Exiting...")
+    except Exception as e:
+        print(f"\nAn unexpected error occurred: {e}")
+        input("Press Enter to exit...")

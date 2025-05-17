@@ -1,17 +1,99 @@
-# Báo cáo Đồ án Thực hành: Gem Hunter
+# Gem Hunter Report
 
-## 1. Thông tin sinh viên
+## 1. Student Information
 
-## 2. Cấu trúc chung của chương trình
+## 2. Project Structure
 
-## 3. Chi tiết thuật toán
+## 3. Logical principles
 
-## 4. Kết quả
+### 3.1. Propositional Logic
 
-### 4.1. Kết quả
+???
 
-### 4.2. Benchmark thời gian chạy trên kích thước maps khác nhau
+## 3. Algorithms
 
-## 5. Kết luận
+### 3.0. DIMACS Format
 
-## 6. Tài liệu tham khảo
+- We use DIMACS format to represent our boolean formulas. The syntax is:
+  - The first line contains `p cnf n m`, with `n` is the number of variables, `m` is the number of clauses.
+  - The next `m` lines contain the clauses, each clause is a list of integers that:
+    - Positive integers represent the variable.
+    - Negative integers represent the negation of the variable.
+    - Each clause ends with a `0`.
+  - Multiple literals in a clause represent a logical OR (∨)
+  - Multiple clauses represent a logical AND (∧)
+- For example:
+
+  $$
+  (\neg{x_1}\vee x_2)\wedge(\neg{x_2}\vee x_3)
+  $$
+
+- The above formula can be represented in DIMACS format as follows:
+
+```
+p cnf 3 2
+-1 2 0
+-2 3 0
+```
+
+- Explanation:
+  - `p cnf 3 2` means 3 variables and 2 clauses
+  - `-1 2 0` represents the clause $(\neg{x_1}\vee x_2)$
+  - `-2 3 0` represents the clause $(\neg{x_2}\vee x_3)$
+
+### 3.1. Problem Formulation
+
+- The grid of size `n x n` with the following symbols:
+
+  - `_`: empty cell.
+  - `G`: cell with a gem.
+  - `T`: cell with a trap.
+  - `X` is a positive integer: the number of traps surrounding the current cell. This cell is neither a gem cell nor a trap cell.
+
+#### Assumptions
+
+- If current cell contains a Trap (`T`), the proposition is true. In other cases, the proposition is false. After this assumption, we can say that the cell is either a trap (TRUE) or not a trap (FALSE).
+- A cell containing a number `X` indicates that there are **exactly** `X` traps in the surrounding cells. The surrounding cells are the 8 adjacent cells (up, down, left, right, and the 4 diagonals).
+
+#### Proof
+
+- Now, we are going to examine a case. For simplicity but enough complexity, we will examine a case that have 2 traps.
+
+|       |       |     |
+| ----- | ----- | --- |
+| **T** | **T** | ?   |
+| ?     | **2** | ?   |
+| ?     | ?     | ?   |
+
+- Note: `?` is a unknown cell. It can be any type of cell (`_`, `G`, or `X`). We will not care about the exact type of the cell, for simplicity.
+
+- Look at the center cell. It contains `2`, which means that there are exactly $2$ traps in the surrounding cells.
+- Expressing this in CNF, we can say that the center cell is `2` if and only if the following conditions are satisfied:
+
+  - There are no more than $2$ traps in the surrounding cells.
+  - There are no less than $2$ traps in the surrounding cells.
+
+- In symbol form, we can say that the center cell is `2` if and only if the following conditions are satisfied:
+
+  - $T_1 + T_2 + T_3 + T_4 + T_5 + T_6 + T_7 + T_8 \leq 2$
+  - $T_1 + T_2 + T_3 + T_4 + T_5 + T_6 + T_7 + T_8 \geq 2$
+
+### 3.2. Brute-force algorithm
+
+For this algorithm, we will try all set of value for the CNF formula. If result is `TRUE`, that means that the current set of value is a solution. If result is `FALSE`, we will try another set of value.
+
+### 3.3. Backtracking algorithm
+
+### 3.4. PySAT
+
+## 4. Results
+
+### 4.1. Results
+
+### 4.2. Benchmark
+
+## 5. Conclusion
+
+## 6. References
+
+[1] Antonio Morgado Alexey Ignatiev Joao Marques-Silva. Boolean formula manipulation (pysat.formula). Accessed: May 2025. url: https://pysathq.github.io/docs/html/api/formula.html

@@ -2,21 +2,7 @@ import random
 import numpy as np
 import os
 import consts
-
-def get_neighbors(i, j, height, width):
-    neighbors = []
-    for di in [-1, 0, 1]:
-        for dj in [-1, 0, 1]:
-            is_current_cell = (di == 0 and dj == 0)
-            if is_current_cell:
-                continue
-            
-            next_i, next_j = i + di, j + dj
-            is_valid_cell = (0 <= next_i < height and 0 <= next_j < width)
-            if is_valid_cell:
-                neighbors.append((next_i, next_j))
-    
-    return neighbors
+import utils.solver_utils as solver_utils
 
 def generate_map(height, width, trap_probability=0.25):
     """
@@ -43,7 +29,7 @@ def generate_map(height, width, trap_probability=0.25):
         for j in range(width):
             is_trap_cell = trap_layout[i, j]
             if not is_trap_cell:
-                neighbors = get_neighbors(i, j, height, width)
+                neighbors = solver_utils.get_neighbors(i, j, height, width)
                 trap_count = sum(trap_layout[ni, nj] for ni, nj in neighbors)
                 
                 if trap_count > consts.ZERO_COUNT:
@@ -60,7 +46,7 @@ def generate_map(height, width, trap_probability=0.25):
                 if solution[i, j] != consts.EMPTY_CELL:
                     continue
                 
-                neighbors = get_neighbors(i, j, height, width)
+                neighbors = solver_utils.get_neighbors(i, j, height, width)
                 has_number = False
                 has_trap = False
                 
@@ -93,77 +79,115 @@ def generate_map(height, width, trap_probability=0.25):
         'width': width
     }
 
-def save_map_to_file(map_data, filename):
+def save_map(map_data, size=None, probability=None, map_dir="maps", name_suffix=None):
     """
-    Save a map and its solution.
-    Ensures that existing files are not overwritten by creating unique filenames.
-    """
-    puzzle = map_data['puzzle']
-    solution = map_data['solution']
+    Save a map using a standardized naming convention and avoiding overwriting.
     
-    solution_dir = os.path.join(os.path.dirname(filename), 'solution_from_generator')
+    Parameters:
+    - map_data: Map data dictionary from generate_map
+    - size: Map size (optional, for filename)
+    - probability: Trap probability (optional, for filename)
+    - map_dir: Directory to save the map in
+    - name_suffix: Optional suffix for the filename
+    
+    Returns:
+    - Path to the saved map file
+    """
+    if not os.path.exists(map_dir):
+        os.makedirs(map_dir)
+        
+    solution_dir = os.path.join(map_dir, 'solution_from_generator')
     if not os.path.exists(solution_dir):
         os.makedirs(solution_dir)
     
-    base_filename = os.path.basename(filename)
-    base_name, ext = os.path.splitext(base_filename)
-    counter = 1    
-    while os.path.exists(filename):
-        new_base_name = f"{base_name}_{counter}{ext}"
-        filename = os.path.join(os.path.dirname(filename), new_base_name)
-        counter += 1
-    solution_filename = os.path.join(solution_dir, os.path.basename(filename))
 
-    if os.path.exists(solution_filename):
-        os.remove(solution_filename)
+    height = map_data.get('height', size)
+    width = map_data.get('width', size)
     
-    with open(filename, 'w') as f:
-        f.write(f"{map_data['height']} {map_data['width']}\n")
-        for row in puzzle:
+    size_part = f"map_{size}x{size}" if size else f"map_{height}x{width}"
+    prob_part = f"_{int(probability*100)}p" if probability else ""
+    suffix_part = f"_{name_suffix}" if name_suffix else ""
+    
+    base_name = f"{size_part}{prob_part}{suffix_part}.txt"
+    filename = os.path.join(map_dir, base_name)
+    
+    counter = 1
+    while os.path.exists(filename):
+        filename = os.path.join(map_dir, f"{base_name[:-4]}_{counter}.txt")
+        counter += 1
+    
+    with open(filename, consts.FILE_WRITE_MODE) as f:
+        f.write(f"{height} {width}\n")
+        for row in map_data['puzzle']:
             f.write(','.join(row) + '\n')
     
-    with open(solution_filename, 'w') as f:
-        f.write(f"{map_data['height']} {map_data['width']}\n")
-        for row in solution:
+    solution_filename = os.path.join(solution_dir, os.path.basename(filename))
+    with open(solution_filename, consts.FILE_WRITE_MODE) as f:
+        f.write(f"{height} {width}\n")
+        for row in map_data['solution']:
             f.write(','.join(row) + '\n')
     
     return filename
 
-def main():
-    """Generate maps."""
-    print("Gem Hunter Map Generator")
-    print("By Thanh-Tien Phan - 22120368")
-    print("This program generates maps for the Gem Hunter game.")
-    print("Note: Map size should be in range [3; 25] for readability.")
-    print("=======================")
+def generate_and_save_map(height, width, trap_probability=0.25, 
+                         map_dir="maps", name_suffix=None, show_solution=False):
+    """
+    Generate a map and save it in one operation.
     
+    Parameters:
+    - height: Height of the map
+    - width: Width of the map
+    - trap_probability: Probability of a cell being a trap (0.0-1.0)
+    - map_dir: Directory to save the map in
+    - name_suffix: Optional suffix for the filename
+    - show_solution: Whether to print the solution to the console
+    
+    Returns:
+    - Dictionary with saved_file path and the generated map_data
+    """
+    print(f"Generating {height}x{width} map with trap probability {trap_probability}...")
+    map_data = generate_map(height, width, trap_probability)
+    
+    saved_file = save_map(
+        map_data, 
+        size=height if height == width else None,
+        probability=trap_probability,
+        map_dir=map_dir,
+        name_suffix=name_suffix
+    )
+    
+    print(f"Map saved to {saved_file}")
+    
+    return {
+        'saved_file': saved_file,
+        'map_data': map_data
+    }
+
+def main():
+    """Main function for standalone map generation."""
     try:
-        num_maps = int(input("Number of maps to be generated [default: 3] ") or "3")
-        min_size = int(input("Minimum map size? [default: 4] ") or "4")
+        num_maps = int(input("Number of maps to be generated [default: 1] ") or "1")
+        min_size = int(input("Minimum map size? [default: 8] ") or "8")
         max_size = int(input("Maximum map size? [default: 8] ") or "8")
         trap_probability = float(input("Trap probability (0.0-1.0)? [default: 0.25] ") or "0.25")
         output_dir = input("Output directory? [default: maps] ") or "maps"
         
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        
         for i in range(num_maps):
             map_size = random.randint(min_size, max_size)
             
-            print(f"Generating map {i+1}/{num_maps} - Size: {map_size}x{map_size}")
-
-            map_data = generate_map(map_size, map_size, trap_probability)
-            
-            # Save map
-            filename = os.path.join(output_dir, f"map_{map_size}x{map_size}_{i+1}.txt")
-            save_map_to_file(map_data, filename)
-            print(f"Map saved to {filename}")
-        
+            result = generate_and_save_map(
+                map_size, map_size, 
+                trap_probability, 
+                map_dir=output_dir,
+                name_suffix=f"{i+1}"
+            )
+                        
     except KeyboardInterrupt:
-        print("\nMap generation cancelled.")
+        print("\nMap generation interrupted.")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"\nError during map generation: {e}")
+    finally:
+        print("\nMap generation complete.")
 
 if __name__ == "__main__":
     main()
-    # TODO: Add a command line argument to specify the number of maps to generate
