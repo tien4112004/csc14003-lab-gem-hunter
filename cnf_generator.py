@@ -65,7 +65,6 @@ class MapToCNF:
         self.clauses = [list(clause) for clause in unique_clauses_set]
         self.clauses.sort(key=lambda x: (len(x), x)) 
 
-        self.to_dimacs("test.cnf")
         self.print_report()
         return self.clauses
     

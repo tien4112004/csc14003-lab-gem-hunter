@@ -1,7 +1,5 @@
 import time
 import consts
-from itertools import combinations
-from utils.solver_utils import get_neighbors, unflatten
 from pysat.formula import CNF
 
 class BruteForceSolver:
@@ -74,7 +72,7 @@ class BruteForceSolver:
         total_combinations = 2 ** num_empty
         
         if total_combinations > consts.WARNING_COMBINATION_COUNT:
-            print(f"Warning: Limited to {consts.WARNING_COMBINATION_COUNT} out of {total_combinations} combinations")
+            print(f"Warning: Limited to {consts.MAX_COMBINATION_COUNT} out of {total_combinations} combinations")
 
         combinations_count = 0
 
@@ -97,7 +95,7 @@ class BruteForceSolver:
                 return solution_grid, solving_time, True
             
             combinations_count += 1
-            if combinations_count % 500000 == 0:
+            if combinations_count % consts.PROGRESS_UPDATE_INTERVAL == 0:
                 print(f"Processed {combinations_count} combinations...")
             if combinations_count >= consts.MAX_COMBINATION_COUNT:
                 print(f"Processed {combinations_count} combinations, stopping to avoid long computation.")
