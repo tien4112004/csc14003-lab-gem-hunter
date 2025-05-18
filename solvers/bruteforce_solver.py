@@ -96,7 +96,7 @@ class BruteForceSolver:
             
             combinations_count += 1
             if combinations_count % consts.PROGRESS_UPDATE_INTERVAL == 0:
-                print(f"Processed {combinations_count} combinations...")
+                print(f"\rProcessed {combinations_count} combinations...", end='', flush=True)
             if combinations_count >= consts.MAX_COMBINATION_COUNT:
                 print(f"Processed {combinations_count} combinations, stopping to avoid long computation.")
                 break
