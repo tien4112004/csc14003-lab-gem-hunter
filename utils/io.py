@@ -1,11 +1,12 @@
 import os
+import consts
 
 def clear_screen():
     """Clear the terminal screen."""
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def get_map_files(map_dir="maps"):
-    """Get a list of all map files in the maps directory."""
+def get_map_files(map_dir=consts.DEFAULT_MAP_DIR):
+    """Get a list of all map files in the testcase directory."""
     if not os.path.exists(map_dir):
         return []
     

@@ -79,7 +79,7 @@ def generate_map(height, width, trap_probability=0.25):
         'width': width
     }
 
-def save_map(map_data, size=None, probability=None, map_dir="maps", name_suffix=None):
+def save_map(map_data, size=None, probability=None, map_dir=consts.DEFAULT_MAP_DIR, name_suffix=None):
     """
     Save a map using a standardized naming convention and avoiding overwriting.
     
@@ -130,7 +130,7 @@ def save_map(map_data, size=None, probability=None, map_dir="maps", name_suffix=
     return filename
 
 def generate_and_save_map(height, width, trap_probability=0.25, 
-                         map_dir="maps", name_suffix=None, show_solution=False):
+                         map_dir=consts.DEFAULT_MAP_DIR, name_suffix=None, show_solution=False):
     """
     Generate a map and save it in one operation.
     
@@ -170,7 +170,7 @@ def main():
         min_size = int(input("Minimum map size? [default: 8] ") or "8")
         max_size = int(input("Maximum map size? [default: 8] ") or "8")
         trap_probability = float(input("Trap probability (0.0-1.0)? [default: 0.25] ") or "0.25")
-        output_dir = input("Output directory? [default: maps] ") or "maps"
+        output_dir = input("Output directory? [default: testcase] ") or consts.DEFAULT_MAP_DIR
         
         for i in range(num_maps):
             map_size = random.randint(min_size, max_size)

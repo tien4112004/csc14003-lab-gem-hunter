@@ -14,7 +14,7 @@ def parse_args():
     parser.add_argument('--generate', action='store_true', help='Generate a new map')
     parser.add_argument('--size', type=int, default=8, help='Size of generated map')
     parser.add_argument('--probability', type=float, default=0.25, help='Trap probability for generated map')
-    parser.add_argument('--output-dir', default='maps', help='Output directory for generated maps')
+    parser.add_argument('--output-dir', default='testcase', help='Output directory for generated maps')
     
     return parser.parse_args()
 

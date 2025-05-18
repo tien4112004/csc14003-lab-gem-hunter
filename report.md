@@ -90,7 +90,7 @@
     - [1. "At most 2 traps" constraint:](#1-at-most-2-traps-constraint)
     - [2. "At least 2 traps" constraint:](#2-at-least-2-traps-constraint)
 - [3. Algorithms](#3-algorithms)
-  - [3.1. DIMACS Format](#31-dimacs-format)
+  - [3.1. DIMACS Format\[1\]](#31-dimacs-format1)
   - [3.2. Brute-force algorithm](#32-brute-force-algorithm)
   - [3.3. Backtracking algorithm](#33-backtracking-algorithm)
   - [3.4. PySAT](#34-pysat)
@@ -122,6 +122,7 @@
 ### 1.2. Project Information
 
 - Demo video link: https://youtu.be/oL49fZFDnOw
+- Git repository: https://github.com/tien4112004/csc14003-lab-gem-hunter
 - Environment:
 
   - Python 3.11 or higher, with Virtual Environment (venv) enabled.
@@ -239,7 +240,7 @@ In our case, $N=8$ (surrounding cells) and $k=2$ (traps). So, we cannot have mor
 
 ## 3. Algorithms
 
-### 3.1. DIMACS Format
+### 3.1. DIMACS Format[1]
 
 - To make the solver read data easier, we will use the DIMACS format to represent our boolean formulas.
 - DIMACS syntax:

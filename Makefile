@@ -1,4 +1,4 @@
-.PHONY: run cnf generate install clean clean-maps clean-cnf
+.PHONY: run cnf generate install clean clean-testcase clean-cnf
 
 VENV_DIR=venv
 ACTIVATE_LINUX:=. venv/bin/activate
@@ -12,7 +12,7 @@ run:
 	@$(PYTHON3) main.py
 
 generate:
-	@echo "Generating maps..."
+	@echo "Generating testcase..."
 	@$(PYTHON3) main.py --generate --size 10 --probability 0.2
 
 install:
@@ -24,11 +24,11 @@ install:
 clean:
 	@echo "Cleaning up the environment..."
 	@rm -rf __pycache__/
-	@rm -f maps/solution/*.txt
+	@rm -f testcase/solution/*.txt
 
-clean-maps:
-	@echo "Cleaning up maps..."
-	@rm -rf maps
+clean-testcase:
+	@echo "Cleaning up testcase..."
+	@rm -rf testcase
 
 clean-cnf:
 	@echo "Cleaning up CNF explanations..."

@@ -138,7 +138,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         map_files = sys.argv[1:]
     else:
-        map_dir = "maps"
+        map_dir = consts.DEFAULT_MAP_DIR
         map_files = [os.path.join(map_dir, f) for f in os.listdir(map_dir) 
                     if f.endswith(".txt") and os.path.isfile(os.path.join(map_dir, f))]
         

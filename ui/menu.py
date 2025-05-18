@@ -1,6 +1,7 @@
 import os
 import sys
 from colorama import Fore, Style
+import consts
 
 from utils.io import clear_screen, get_map_files, load_map, save_solution
 import map_generator
@@ -44,7 +45,7 @@ def map_selection_menu():
     """Display a menu to select a map and return the selected map file."""
     map_files = get_map_files()
     if not map_files:
-        print("No maps found in the maps/ directory!")
+        print("No maps found in the testcase/ directory!")
         input("Press Enter to continue...")
         return None
     
@@ -68,7 +69,7 @@ def map_selection_menu():
             
             choice = int(choice) - 1
             if 0 <= choice < len(map_files):
-                return os.path.join("maps", map_files[choice])
+                return os.path.join(consts.DEFAULT_MAP_DIR, map_files[choice])
             else:
                 print(f"Please enter a number between 0 and {len(map_files)}.")
         except ValueError:

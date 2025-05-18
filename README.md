@@ -40,52 +40,26 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+## Run the program
+
+```bash
+make run
+```
+
+If you encounter any issues, you can run the main program directly, ensure that the virtual environment is activated:
+
+```bash
+python3 main.py
+```
+
 ## Solvers Implemented
 
 1. **SAT Solver**: Uses the pysat library to convert the puzzle into CNF form and solve it.
 2. **Brute Force**: Tries all possible combinations of trap and gem placements.
 3. **Backtracking**: Uses backtracking with constraint propagation for faster solving.
 
-## Usage
-
-### Main Program
-
-- To run the main program, use the following command:
-
-```bash
-make run
-```
-
-- If error occurred, you can run the main program directly:
-
-```bash
-python3 main.py
-```
-
-This provides a simple UI for selecting different functions:
-
-- Generate new maps
-- Solve maps with different solvers
-- Run benchmarks
-- View CNF explanations
-
-### Solver Command Line Interface
-
-```bash
-python solver_cli.py
-```
-
-Provides a more detailed CLI with the following options:
-
-- Generate maps
-- Solve maps using different solvers
-- Run benchmarks
-- View CNF explanations
-
 ### Map Generator
 
-```bash
-python map_generator.py
-```
+Run the program, and select the "Generate Maps" option from the menu.
 
 An interactive generator will be launched. You can choose the number of maps, max_size and min_size of the maps, and the trap probability. By default, the generator will create a folder called `maps` with the generated maps.
