@@ -92,8 +92,64 @@ def solve_map(filename, solver_type='all'):
             success = "✓" if data['success'] else "✗"
             time_str = f"{data['time']:.6f}" if data['success'] else "N/A"
             print(f"{solver.upper():<15} {success:<10} {time_str:<15}")
-    
+
+        compare_solutions(results)
+
     return results
+
+def compare_solutions(solutions):
+    """
+    Compare solutions from different solvers to check if they match.
+    
+    Args:
+        solutions: Dictionary of solutions from different solvers
+        
+    Returns:
+        bool: True if all solutions match, False otherwise
+    """
+    valid_solutions = {solver: data['solution'] 
+                       for solver, data in solutions.items() 
+                       if data['success'] and data['solution']}
+    
+    if len(valid_solutions) <= 1:
+        return True
+    
+    reference_solver = list(valid_solutions.keys())[0]
+    reference_solution = valid_solutions[reference_solver]
+    
+    differences = {}
+    all_match = True
+    
+    for solver, solution in valid_solutions.items():
+        if solver == reference_solver:
+            continue
+            
+        is_same = True
+        diff_cells = []
+        
+        for i in range(len(reference_solution)):
+            for j in range(len(reference_solution[0])):
+                if reference_solution[i][j] != solution[i][j]:
+                    is_same = False
+                    diff_cells.append((i, j, reference_solution[i][j], solution[i][j]))
+        
+        if not is_same:
+            all_match = False
+            differences[solver] = diff_cells
+    
+    if not all_match:
+        print("\n" + "="*50)
+        print("SOLUTION DIFFERENCES DETECTED:")
+        print("-"*50)
+        
+        for solver, diffs in differences.items():
+            print(f"\nDifferences between {reference_solver.upper()} and {solver.upper()}:")
+            for i, j, ref_val, sol_val in diffs:
+                print(f"  Position ({i},{j}): {ref_val} vs {sol_val}")
+    else:
+        print("\nAll solutions match! ✓")
+    
+    return all_match
 
 if __name__ == "__main__":
     import sys

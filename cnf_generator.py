@@ -94,31 +94,31 @@ class MapToCNF:
     
     def print_report(self):
         """Print a report about the CNF conversion process"""
-        assigned_cells = 0
-        neighbor_count = 0
-        unreachable_cells = 0
+        # assigned_cells = 0
+        # neighbor_count = 0
+        # unreachable_cells = 0
         
-        for row in range(self.n):
-            for col in range(self.n):
-                cell = self.grid[row][col]
+        # for row in range(self.n):
+        #     for col in range(self.n):
+        #         cell = self.grid[row][col]
                 
-                # Count assigned cells (cells with numbers)
-                if cell != consts.EMPTY_CELL:
-                    assigned_cells += 1
+        #         # Count assigned cells (cells with numbers)
+        #         if cell != consts.EMPTY_CELL:
+        #             assigned_cells += 1
                 
-                # Count neighbor relationships
-                cell_neighbors = get_neighbors(row, col, self.n, self.n)
-                neighbor_count += len(cell_neighbors)
+        #         # Count neighbor relationships
+        #         cell_neighbors = get_neighbors(row, col, self.n, self.n)
+        #         neighbor_count += len(cell_neighbors)
                 
-                # Check for unreachable empty cells
-                if cell == consts.EMPTY_CELL:
-                    has_assigned_neighbor = False
-                    for nr, nc in cell_neighbors:
-                        if self.grid[nr][nc] != consts.EMPTY_CELL:
-                            has_assigned_neighbor = True
-                            break
-                    if not has_assigned_neighbor:
-                        unreachable_cells += 1
+        #         # Check for unreachable empty cells
+        #         if cell == consts.EMPTY_CELL:
+        #             has_assigned_neighbor = False
+        #             for nr, nc in cell_neighbors:
+        #                 if self.grid[nr][nc] != consts.EMPTY_CELL:
+        #                     has_assigned_neighbor = True
+        #                     break
+        #             if not has_assigned_neighbor:
+        #                 unreachable_cells += 1
         
         grid_size = f"{self.n}x{self.n}"
         total_vars = self.n * self.n
@@ -126,9 +126,6 @@ class MapToCNF:
         
         print(f"Grid size: {grid_size}")
         print(f"Total variables: {total_vars}")
-        print(f"Number cell constraints: {assigned_cells}")
-        print(f"Gem-trap constraints: {neighbor_count}")
-        print(f"Unreachable cell constraints: {unreachable_cells}")
         print(f"Total unique clauses: {total_clauses}")
         
 
